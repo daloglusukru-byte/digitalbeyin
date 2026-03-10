@@ -543,6 +543,14 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
         <input type="password" class="api-key-input" id="api-key-input" placeholder="Gemini API key (AIza…)" autocomplete="off">
         <button class="api-save-btn" onclick="saveApiKey()">💾 Kaydet</button>
       </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px;font-size:11px;font-family:'DM Mono',monospace;line-height:2;color:var(--text-muted);">
+        <div style="font-weight:700;color:var(--text);margin-bottom:6px;">🔑 Ücretsiz Gemini API Key Nasıl Alınır?</div>
+        <div>1️⃣ <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent2);">aistudio.google.com/app/apikey</a> aç</div>
+        <div>2️⃣ Google hesabınla giriş yap</div>
+        <div>3️⃣ <strong style="color:var(--text);">"Create API key"</strong> butonuna tıkla</div>
+        <div>4️⃣ Kopyala → buraya yapıştır → 💾 Kaydet</div>
+        <div style="margin-top:4px;color:var(--text-dim);">✅ Tamamen ücretsiz · Günlük limit yeterli · Kart gerekmez</div>
+      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
         <button class="ai-btn" onclick="askCoach('daily')" id="ai-ask-btn" style="margin-bottom:0;flex:1;">
           ✨ Bugün ne yapmalıyım?
@@ -909,6 +917,7 @@ function makeCard(note) {
       <button class="ai-card-btn" onclick="aiAutoCategory(${note.id},this)" title="AI kategori belirlesin">🏷️ Kategorile</button>
       <button class="ai-card-btn" onclick="aiExpand(${note.id},this)" title="AI notu genişletsin">📝 Genişlet</button>
       ${note.source==='voice'?`<button class="ai-card-btn" onclick="aiFixVoice(${note.id},this)" title="AI ses yazısını düzeltsin">🔧 Düzelt</button>`:''}
+      <button class="ai-card-btn" onclick="addToGCal(${note.id})" title="Google Takvim'e ekle" style="color:var(--accent2);border-color:rgba(88,166,255,.3);">📅 Takvime</button>
     </div>
     <div class="ai-card-result" id="air-${note.id}"></div>
     <div class="note-footer">
@@ -1254,8 +1263,17 @@ function startMic() {
     liveTranscript += final;
     document.getElementById('voice-live').textContent = (liveTranscript + interim) || 'Türkçe konuş…';
   };
-  recognition.onerror = e => { if (e.error !== 'aborted') showToast('❌ Mikrofon: ' + e.error, 'warning'); stopMicUI(); };
-  recognition.onend = () => { if (isRecording) try { recognition.start(); } catch(e){} };
+  recognition.onerror = e => { 
+    if (e.error === 'no-speech') return; // sessizlik = durma, devam et
+    if (e.error !== 'aborted') showToast('❌ Mikrofon: ' + e.error, 'warning'); 
+    stopMicUI(); 
+  };
+  recognition.onend = () => { 
+    if (isRecording) { 
+      // Kendiliğinden durdu — hemen yeniden başlat, kullanıcı Durdur'a basana kadar
+      setTimeout(() => { try { recognition.start(); } catch(e){} }, 100);
+    } 
+  };
   isRecording = true;
   document.getElementById('mic-btn').classList.add('recording');
   document.getElementById('mic-btn').textContent = '⏹';
@@ -1428,6 +1446,60 @@ function downloadPhoto() {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
 // ══════════════════════════════════════════
+//  GOOGLE CALENDAR
+// ══════════════════════════════════════════
+function toGCalDate(isoOrDate, durationMin = 60) {
+  const d = new Date(isoOrDate);
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = dt => `${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}00`;
+  const end = new Date(d.getTime() + durationMin * 60000);
+  return `${fmt(d)}/${fmt(end)}`;
+}
+
+function toGCalDateAllDay(dateStr) {
+  // dateStr = 'YYYY-MM-DD'
+  const d = new Date(dateStr + 'T00:00:00');
+  const next = new Date(d); next.setDate(next.getDate()+1);
+  const fmt = dt => `${dt.getFullYear()}${String(dt.getMonth()+1).padStart(2,'0')}${String(dt.getDate()).padStart(2,'0')}`;
+  return `${fmt(d)}/${fmt(next)}`;
+}
+
+function openGCal(title, dates, details) {
+  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE`
+    + `&text=${encodeURIComponent(title)}`
+    + `&dates=${encodeURIComponent(dates)}`
+    + `&details=${encodeURIComponent(details)}`;
+  window.open(url, '_blank');
+}
+
+function addToGCal(id) {
+  const n = notes.find(n => n.id === id);
+  if (!n) return;
+  let dates;
+  if (n.reminder) {
+    dates = toGCalDate(n.reminder, 30);
+  } else {
+    // All-day today
+    dates = toGCalDateAllDay(new Date().toISOString().slice(0,10));
+  }
+  const title = `🧠 ${n.text.slice(0, 60)}${n.text.length > 60 ? '…' : ''}`;
+  const details = `Kategori: ${catLabel(n.cat)}\n${n.text}\n\n— Dijital Beyin'den eklendi`;
+  openGCal(title, dates, details);
+  showToast('📅 Google Takvim açılıyor…', 'info');
+}
+
+function addKasaToGCal(id) {
+  const e = kasaEntries.find(e => e.id === id);
+  if (!e) return;
+  const dates = toGCalDateAllDay(e.date);
+  const sign = e.type === 'gelir' ? '+' : '-';
+  const title = `💰 ${sign}${e.amount}₺ — ${e.desc}`;
+  const details = `Tür: ${e.type === 'gelir' ? 'Gelir' : 'Gider'}\nKategori: ${kasaCatLabels[e.cat]||e.cat}\nTutar: ${sign}${e.amount}₺\nAçıklama: ${e.desc}\n\n— Dijital Beyin Kasa'dan eklendi`;
+  openGCal(title, dates, details);
+  showToast('📅 Google Takvim açılıyor…', 'info');
+}
+
+// ══════════════════════════════════════════
 //  KASA
 // ══════════════════════════════════════════
 const kasaCatLabels = {
@@ -1518,6 +1590,7 @@ function renderKasa() {
           <div class="kasa-item-meta">${kasaCatLabels[e.cat]||e.cat} · ${d}</div>
         </div>
         <span class="kasa-item-amount ${e.type}">${e.type==='gelir'?'+':'−'}${formatMoney(e.amount)}</span>
+        <button class="kasa-item-del" onclick="addKasaToGCal(${e.id})" title="Takvime ekle" style="opacity:0;color:var(--accent2);font-size:12px;">📅</button>
         <button class="kasa-item-del" onclick="deleteKasaEntry(${e.id})" title="Sil">×</button>`;
       list.appendChild(item);
     });
