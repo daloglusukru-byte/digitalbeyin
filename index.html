@@ -296,6 +296,12 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .kasa-cat-sel:focus{border-color:var(--accent2);color:var(--text);}
 .kasa-save-btn{background:linear-gradient(135deg,var(--accent),#2ea043);color:#000;border:none;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .kasa-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(57,211,83,.3);}
+.kasa-voice-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.kasa-voice-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+.kasa-voice-btn.recording{background:rgba(247,129,102,.15);border-color:var(--accent3);color:var(--accent3);animation:mic-pulse 1s ease-in-out infinite;}
+.kasa-voice-hint{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;padding:6px 10px;background:var(--surface2);border-radius:7px;border:1px solid var(--border);margin-bottom:10px;line-height:1.8;display:none;}
+.kasa-voice-hint.visible{display:block;}
+.kasa-voice-preview{font-size:11px;color:var(--accent2);font-family:'DM Mono',monospace;min-height:16px;margin-top:4px;font-style:italic;}
 .kasa-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-height:320px;overflow-y:auto;}
 .kasa-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;animation:card-in .25s ease;}
 .kasa-item:hover{border-color:var(--border2);}
@@ -471,6 +477,14 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
     <!-- Giriş formu -->
     <div class="kasa-add">
+      <!-- Sesli giriş -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <button class="kasa-voice-btn" id="kasa-mic-btn" onclick="toggleKasaMic()" title="Sesli kasa girişi">🎙️</button>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--text);">Sesli Giriş</div>
+          <div class="kasa-voice-preview" id="kasa-voice-preview">örn: "150 lira kahve" · "3000 lira maaş geldi"</div>
+        </div>
+      </div>
       <div class="kasa-row">
         <div class="kasa-type-btns">
           <button class="kasa-type-btn gelir-btn active" onclick="setKasaType('gelir',this)">+ Gelir</button>
@@ -1532,6 +1546,150 @@ function addKasaToGCal(id) {
   const details = `Tür: ${e.type === 'gelir' ? 'Gelir' : 'Gider'}\nKategori: ${kasaCatLabels[e.cat]||e.cat}\nTutar: ${sign}${e.amount}₺\nAçıklama: ${e.desc}\n\n— Dijital Beyin Kasa'dan eklendi`;
   openGCal(title, dates, details);
   showToast('📅 Google Takvim açılıyor…', 'info');
+}
+
+// ══════════════════════════════════════════
+//  KASA SESLİ GİRİŞ
+// ══════════════════════════════════════════
+let kasaRecognition = null;
+let isKasaRecording = false;
+
+function toggleKasaMic() {
+  if (isKasaRecording) { stopKasaMic(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showToast('⚠️ Chrome/Edge kullan!', 'warning'); return; }
+  startKasaMic();
+}
+
+function startKasaMic() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  kasaRecognition = new SR();
+  kasaRecognition.lang = 'tr-TR';
+  kasaRecognition.continuous = false;
+  kasaRecognition.interimResults = true;
+
+  kasaRecognition.onresult = e => {
+    let text = '';
+    for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
+    document.getElementById('kasa-voice-preview').textContent = '🎙️ ' + text;
+    if (e.results[e.results.length-1].isFinal) {
+      stopKasaMicUI();
+      parseKasaVoice(text.trim());
+    }
+  };
+  kasaRecognition.onerror = e => { stopKasaMicUI(); if (e.error !== 'no-speech') showToast('❌ ' + e.error, 'warning'); };
+  kasaRecognition.onend = () => stopKasaMicUI();
+
+  isKasaRecording = true;
+  document.getElementById('kasa-mic-btn').classList.add('recording');
+  document.getElementById('kasa-mic-btn').textContent = '⏹';
+  document.getElementById('kasa-voice-preview').textContent = '🎙️ Dinliyorum… (örn: "150 lira kahve")';
+  try { kasaRecognition.start(); } catch(e) {}
+}
+
+function stopKasaMic() {
+  isKasaRecording = false;
+  if (kasaRecognition) { try { kasaRecognition.stop(); } catch(e){} kasaRecognition = null; }
+  stopKasaMicUI();
+}
+
+function stopKasaMicUI() {
+  isKasaRecording = false;
+  document.getElementById('kasa-mic-btn').classList.remove('recording');
+  document.getElementById('kasa-mic-btn').textContent = '🎙️';
+}
+
+async function parseKasaVoice(text) {
+  document.getElementById('kasa-voice-preview').textContent = '⏳ Analiz ediliyor: "' + text + '"';
+
+  // Önce basit local parse dene (API gerekmeden)
+  const localResult = localParseKasa(text);
+  if (localResult) {
+    applyKasaResult(localResult, text);
+    return;
+  }
+
+  // Local parse yetmezse Gemini'ye sor
+  if (!apiKey) {
+    // Yine de local parse ile devam et
+    applyKasaResult({ type: 'gider', amount: 0, cat: 'diger', desc: text }, text);
+    showToast('⚠️ API key girilmemiş, manuel düzelt', 'warning');
+    return;
+  }
+
+  try {
+    const prompt = `Aşağıdaki Türkçe sesli komutu analiz et ve JSON döndür. Başka hiçbir şey yazma.
+
+Komut: "${text}"
+
+Örnek girdiler ve çıktılar:
+- "150 lira kahve" → {"type":"gider","amount":150,"cat":"yemek","desc":"Kahve"}
+- "500 tl yakıt" → {"type":"gider","amount":500,"cat":"ulasim","desc":"Yakıt"}
+- "3000 lira maaş geldi" → {"type":"gelir","amount":3000,"cat":"maas","desc":"Maaş"}
+- "kira ödedim 8500" → {"type":"gider","amount":8500,"cat":"kira","desc":"Kira"}
+- "market 320 tl" → {"type":"gider","amount":320,"cat":"market","desc":"Market alışverişi"}
+- "freelance 5000 aldım" → {"type":"gelir","amount":5000,"cat":"freelance","desc":"Freelance geliri"}
+
+Kategoriler (sadece bunları kullan): market, yemek, kira, fatura, ulasim, saglik, eglence, giyim, egitim, freelance, maas, diger
+
+JSON formatı: {"type":"gelir|gider","amount":SAYI,"cat":"KATEGORİ","desc":"AÇIKLAMA"}`;
+
+    const result = await callGemini(prompt, 100);
+    const clean = result.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    applyKasaResult(parsed, text);
+  } catch(e) {
+    showToast('❌ Anlaşılamadı, manuel gir', 'warning');
+    document.getElementById('kasa-voice-preview').textContent = '"' + text + '" — anlaşılamadı';
+  }
+}
+
+function localParseKasa(text) {
+  const t = text.toLowerCase();
+  // Extract amount
+  const amountMatch = t.match(/(\d+(?:[.,]\d+)?)\s*(?:tl|lira|₺)?/);
+  if (!amountMatch) return null;
+  const amount = parseFloat(amountMatch[1].replace(',','.'));
+  if (!amount) return null;
+
+  // Detect type
+  const gelirWords = ['geldi','aldım','kazandım','maaş','ücret','freelance','gelir','tahsilat'];
+  const type = gelirWords.some(w => t.includes(w)) ? 'gelir' : 'gider';
+
+  // Detect category
+  const catMap = [
+    { cat:'market', words:['market','alışveriş','migros','a101','bim','şok','carrefour'] },
+    { cat:'yemek', words:['kahve','yemek','restoran','lokanta','pizza','burger','döner','cafe','çay','su'] },
+    { cat:'kira', words:['kira'] },
+    { cat:'fatura', words:['fatura','elektrik','su','doğalgaz','internet','telefon'] },
+    { cat:'ulasim', words:['yakıt','benzin','akaryakıt','taksi','uber','otobüs','metro','ulaşım'] },
+    { cat:'saglik', words:['eczane','ilaç','doktor','hastane','sağlık'] },
+    { cat:'eglence', words:['sinema','oyun','netflix','spotify','eğlence'] },
+    { cat:'giyim', words:['kıyafet','giyim','ayakkabı','elbise'] },
+    { cat:'maas', words:['maaş','ücret','promosyon','ikramiye'] },
+    { cat:'freelance', words:['freelance','proje','danışmanlık'] },
+  ];
+  let cat = 'diger';
+  for (const c of catMap) { if (c.words.some(w => t.includes(w))) { cat = c.cat; break; } }
+  if (type === 'gelir' && cat === 'diger') cat = 'maas';
+
+  // Desc — first meaningful word
+  const desc = text.replace(/\d+/g,'').replace(/tl|lira|₺/gi,'').trim();
+
+  return { type, amount, cat, desc: desc || (type === 'gelir' ? 'Gelir' : 'Gider') };
+}
+
+function applyKasaResult(result, originalText) {
+  // Apply to form fields
+  document.getElementById('kasa-amount').value = result.amount;
+  document.getElementById('kasa-desc').value = result.desc || originalText;
+  document.getElementById('kasa-cat').value = result.cat || 'diger';
+  // Set type buttons
+  const typeBtn = document.querySelector(`.kasa-type-btn.${result.type}-btn`);
+  if (typeBtn) setKasaType(result.type, typeBtn);
+  document.getElementById('kasa-voice-preview').textContent =
+    `✅ ${result.type === 'gelir' ? '💚 Gelir' : '🔴 Gider'}: ${result.amount}₺ · ${kasaCatLabels[result.cat]||result.cat}`;
+  showToast('🎙️ Anlaşıldı! Kontrol et → Ekle bas', 'success');
 }
 
 // ══════════════════════════════════════════
