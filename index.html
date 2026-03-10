@@ -270,7 +270,13 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 /* ── NOTIF BADGE ── */
 .notif-badge{position:fixed;top:16px;right:16px;background:var(--accent3);color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;box-shadow:0 4px 18px rgba(247,129,102,.4);z-index:800;animation:card-in .3s ease;cursor:pointer;display:flex;align-items:center;gap:5px;}
 
-/* ── KASA ── */
+/* ── FLOATING MIC ── */
+.fab-mic{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent3),#e05a3a);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(247,129,102,.5);transition:all .2s;z-index:400;}
+.fab-mic:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(247,129,102,.65);}
+.fab-mic.recording{animation:fab-pulse 1s ease-in-out infinite;background:linear-gradient(135deg,#e05a3a,var(--accent3));}
+@keyframes fab-pulse{0%,100%{box-shadow:0 4px 20px rgba(247,129,102,.5);}50%{box-shadow:0 0 0 12px rgba(247,129,102,0);}}
+.fab-mic-label{position:fixed;bottom:86px;right:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);white-space:nowrap;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;}
+.fab-mic:hover ~ .fab-mic-label{opacity:1;}
 .kasa-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
 .kasa-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
 .kasa-card-num{font-size:20px;font-weight:800;font-family:'DM Mono',monospace;line-height:1;margin-bottom:4px;}
@@ -315,6 +321,12 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 .kasa-item-del{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;transition:all .1s;opacity:0;}
 .kasa-item:hover .kasa-item-del{opacity:1;}
 .kasa-item-del:hover{background:var(--surface2);color:var(--accent3);}
+.kasa-edit-form{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);gap:6px;flex-wrap:wrap;align-items:center;}
+.kasa-edit-form.visible{display:flex;}
+.kasa-edit-input{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:11px;outline:none;}
+.kasa-edit-input:focus{border-color:var(--accent2);}
+.kasa-edit-save{background:var(--accent);color:#000;border:none;border-radius:6px;padding:5px 12px;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;}
+.kasa-edit-cancel{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text-muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
 /* Category bar chart */
 .kasa-chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
 .kasa-chart-title{font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
@@ -406,8 +418,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     <!-- Capture zone -->
     <div class="capture-zone">
       <div class="capture-row1">
-        <input class="capture-input" id="capture-input" placeholder="Aklına ne geldi? Yaz veya mikrofona bas…" autocomplete="off">
-        <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Sesli not">🎙️</button>
+        <input class="capture-input" id="capture-input" placeholder="Aklına ne geldi? Yaz veya 🎙️ bas…" autocomplete="off">
       </div>
       <div class="capture-row2">
         <div class="cat-pills">
@@ -477,11 +488,11 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
     <!-- Giriş formu -->
     <div class="kasa-add">
-      <!-- Sesli giriş -->
+      <!-- Sesli giriş hint -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
-        <button class="kasa-voice-btn" id="kasa-mic-btn" onclick="toggleKasaMic()" title="Sesli kasa girişi">🎙️</button>
+        <span style="font-size:20px;">🎙️</span>
         <div>
-          <div style="font-size:11px;font-weight:700;color:var(--text);">Sesli Giriş</div>
+          <div style="font-size:11px;font-weight:700;color:var(--text);">Sesli Giriş — Sağ alttaki mikrofonu kullan</div>
           <div class="kasa-voice-preview" id="kasa-voice-preview">örn: "150 lira kahve" · "3000 lira maaş geldi"</div>
         </div>
       </div>
@@ -635,6 +646,10 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
 </div><!-- .app -->
 
+<!-- Floating Mic Button -->
+<button class="fab-mic" id="fab-mic" onclick="toggleFloatMic()" title="Sesli giriş">🎙️</button>
+<div class="fab-mic-label" id="fab-label">Notlar sekmesi</div>
+
 <!-- Voice Overlay -->
 <div class="voice-overlay" id="voice-overlay">
   <div class="voice-title">🎙️ Seni dinliyorum…</div>
@@ -644,7 +659,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
   </div>
   <div class="voice-live" id="voice-live">Türkçe konuş, yazayım…</div>
-  <button class="stop-btn" onclick="stopMic()">⏹ Kaydet & Kapat</button>
+  <button class="stop-btn" onclick="stopFloatMic()">⏹ Kaydet & Kapat</button>
 </div>
 
 <!-- PIN Modal -->
@@ -712,11 +727,20 @@ setTimeout(buildHeatmap, 100);
 // ══════════════════════════════════════════
 //  TABS
 // ══════════════════════════════════════════
+let activeTab = 'notes';
 function switchTab(name, el) {
+  activeTab = name;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-' + name).classList.add('active');
   el.classList.add('active');
+  // Update fab label
+  const labels = {notes:'📝 Not ekle', kasa:'💰 Kasa girişi', coach:'🤖 AI Koç', stats:'📊 İstatistik', settings:'⚙️ Ayarlar'};
+  const fabLabel = document.getElementById('fab-label');
+  if (fabLabel) fabLabel.textContent = labels[name] || '';
+  // Hide fab on non-input tabs
+  const fab = document.getElementById('fab-mic');
+  if (fab) fab.style.display = (name === 'stats' || name === 'settings' || name === 'coach') ? 'none' : 'flex';
   if (name === 'stats') buildHeatmap();
 }
 
@@ -1251,107 +1275,109 @@ document.getElementById('pin-modal-input').addEventListener('keydown', e => {
 // ══════════════════════════════════════════
 //  VOICE INPUT
 // ══════════════════════════════════════════
-let recognition = null;
-let isRecording = false;
-let liveTranscript = '';
 
-function startMicContinue(savedTranscript) {
-  if (!isRecording) return;
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.lang = 'tr-TR';
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  liveTranscript = savedTranscript; // önceki metni koru
+// ══════════════════════════════════════════
+//  UNIFIED FLOATING MIC
+// ══════════════════════════════════════════
+let floatRecognition = null;
+let isFloatRecording = false;
+let floatTranscript = '';
 
-  recognition.onresult = e => {
-    let interim = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) liveTranscript += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    document.getElementById('voice-live').textContent = (liveTranscript + interim) || 'Türkçe konuş…';
-  };
-  recognition.onerror = e => {
-    if (e.error === 'no-speech') return;
-    if (e.error !== 'aborted') showToast('❌ Mikrofon: ' + e.error, 'warning');
-    stopMicUI();
-  };
-  recognition.onend = () => {
-    if (isRecording) {
-      const saved = liveTranscript;
-      setTimeout(() => startMicContinue(saved), 150);
-    }
-  };
-  try { recognition.start(); } catch(e) {}
-}
-
-function toggleMic() {
-  if (isRecording) { stopMic(); return; }
+function toggleFloatMic() {
+  if (isFloatRecording) { stopFloatMic(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showToast('⚠️ Chrome/Edge kullan!', 'warning'); return; }
-  startMic();
+  startFloatMic();
 }
-function startMic() {
-  liveTranscript = '';
+
+function startFloatMic() {
+  floatTranscript = '';
+  const mode = activeTab === 'kasa' ? 'kasa' : 'not';
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SR();
-  recognition.lang = 'tr-TR';
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.onresult = e => {
+  floatRecognition = new SR();
+  floatRecognition.lang = 'tr-TR';
+  floatRecognition.continuous = mode === 'not'; // not modunda sürekli, kasada tek cümle
+  floatRecognition.interimResults = true;
+
+  floatRecognition.onresult = e => {
     let interim = '';
-    // Only process new results from resultIndex onwards
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        liveTranscript += e.results[i][0].transcript;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
+      if (e.results[i].isFinal) floatTranscript += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
     }
-    document.getElementById('voice-live').textContent = (liveTranscript + interim) || 'Türkçe konuş…';
+    const display = floatTranscript + interim;
+    document.getElementById('voice-live').textContent = display || (mode === 'kasa' ? '"150 lira kahve" gibi söyle…' : 'Türkçe konuş…');
+    // Kasa modunda final gelince otomatik işle
+    if (mode === 'kasa' && e.results[e.results.length-1]?.isFinal && floatTranscript.trim()) {
+      stopFloatMicUI();
+      isFloatRecording = false;
+      parseKasaVoice(floatTranscript.trim());
+    }
   };
-  recognition.onerror = e => { 
-    if (e.error === 'no-speech') return; // sessizlik = durma, devam et
-    if (e.error !== 'aborted') showToast('❌ Mikrofon: ' + e.error, 'warning'); 
-    stopMicUI(); 
+
+  floatRecognition.onerror = e => {
+    if (e.error === 'no-speech') return;
+    if (e.error !== 'aborted') showToast('❌ Mikrofon: ' + e.error, 'warning');
+    stopFloatMicUI();
   };
-  recognition.onend = () => { 
-    if (isRecording) { 
-      // Yeniden başlatırken yeni bir instance oluştur — transcript tekrarlanmasın
-      const savedTranscript = liveTranscript;
-      startMicContinue(savedTranscript);
-    } 
+
+  floatRecognition.onend = () => {
+    if (isFloatRecording && mode === 'not') {
+      // Not modunda sürekli çalış
+      const saved = floatTranscript;
+      setTimeout(() => {
+        if (!isFloatRecording) return;
+        floatTranscript = saved;
+        try { floatRecognition.start(); } catch(err) {}
+      }, 150);
+    } else {
+      stopFloatMicUI();
+    }
   };
-  isRecording = true;
-  document.getElementById('mic-btn').classList.add('recording');
-  document.getElementById('mic-btn').textContent = '⏹';
+
+  isFloatRecording = true;
+  document.getElementById('fab-mic').classList.add('recording');
+  document.getElementById('fab-mic').textContent = '⏹';
   document.getElementById('voice-overlay').classList.add('active');
-  try { recognition.start(); } catch(e){}
+  document.getElementById('voice-live').textContent = mode === 'kasa' ? '"150 lira kahve" gibi söyle…' : 'Türkçe konuş…';
+  // Update overlay title based on mode
+  document.querySelector('.voice-title').textContent = mode === 'kasa' ? '💰 Kasa girişi…' : '🎙️ Seni dinliyorum…';
+  try { floatRecognition.start(); } catch(e) {}
 }
-function stopMic() {
-  isRecording = false;
-  if (recognition) { try { recognition.stop(); } catch(e){} recognition = null; }
-  stopMicUI();
-  const text = liveTranscript.trim();
-  if (text) {
+
+function stopFloatMic() {
+  isFloatRecording = false;
+  if (floatRecognition) { try { floatRecognition.stop(); } catch(e){} floatRecognition = null; }
+  stopFloatMicUI();
+  const text = floatTranscript.trim();
+  if (!text) return;
+
+  if (activeTab === 'kasa') {
+    parseKasaVoice(text);
+  } else {
+    // Not modu — input'a yaz ve kaydet
     const inp = document.getElementById('capture-input');
-    inp.value = (inp.value ? inp.value + ' ' : '') + text;
-    // Auto-save voice note
-    const srcNote = inp.value.trim();
-    if (srcNote) {
-      inp.value = text;
-      addNote('voice');
-    }
+    inp.value = text;
+    addNote('voice');
     showToast('🎙️ Ses kaydedildi!', 'success');
   }
 }
-function stopMicUI() {
-  isRecording = false;
-  document.getElementById('mic-btn').classList.remove('recording');
-  document.getElementById('mic-btn').textContent = '🎙️';
+
+function stopFloatMicUI() {
+  isFloatRecording = false;
+  const fab = document.getElementById('fab-mic');
+  if (fab) { fab.classList.remove('recording'); fab.textContent = '🎙️'; }
   document.getElementById('voice-overlay').classList.remove('active');
 }
+
+// Legacy aliases (eski kodlardan kalan çağrılar için)
+function toggleMic() { toggleFloatMic(); }
+function stopMic() { stopFloatMic(); }
+function startMic() { startFloatMic(); }
+function stopMicUI() { stopFloatMicUI(); }
+function toggleKasaMic() { toggleFloatMic(); }
+function stopKasaMic() { stopFloatMic(); }
+function stopKasaMicUI() { stopFloatMicUI(); }
 
 // ══════════════════════════════════════════
 //  TTS
@@ -1551,8 +1577,6 @@ function addKasaToGCal(id) {
 // ══════════════════════════════════════════
 //  KASA SESLİ GİRİŞ
 // ══════════════════════════════════════════
-let kasaRecognition = null;
-let isKasaRecording = false;
 
 function toggleKasaMic() {
   if (isKasaRecording) { stopKasaMic(); return; }
@@ -1743,6 +1767,30 @@ function addKasaEntry() {
   showToast(kasaType === 'gelir' ? '💚 Gelir eklendi!' : '🔴 Gider eklendi!', 'success');
 }
 
+function toggleKasaEdit(id) {
+  const form = document.getElementById('kedit-' + id);
+  if (form) form.classList.toggle('visible');
+}
+
+function saveKasaEdit(id) {
+  const e = kasaEntries.find(e => e.id === id);
+  if (!e) return;
+  const desc = document.getElementById('kedit-desc-' + id).value.trim();
+  const amount = parseFloat(document.getElementById('kedit-amount-' + id).value);
+  const cat = document.getElementById('kedit-cat-' + id).value;
+  const type = document.getElementById('kedit-type-' + id).value;
+  const date = document.getElementById('kedit-date-' + id).value;
+  if (!amount || amount <= 0) { showToast('⚠️ Geçerli tutar gir!', 'warning'); return; }
+  e.desc = desc || e.desc;
+  e.amount = amount;
+  e.cat = cat;
+  e.type = type;
+  e.date = date || e.date;
+  saveKasa();
+  renderKasa();
+  showToast('✅ Güncellendi!', 'success');
+}
+
 function deleteKasaEntry(id) {
   kasaEntries = kasaEntries.filter(e => e.id !== id);
   saveKasa(); renderKasa();
@@ -1775,16 +1823,34 @@ function renderKasa() {
     filtered.forEach(e => {
       const item = document.createElement('div');
       item.className = 'kasa-item';
+      item.style.flexDirection = 'column';
+      item.style.alignItems = 'stretch';
       const d = new Date(e.date).toLocaleDateString('tr-TR', {day:'numeric',month:'short'});
       item.innerHTML = `
-        <span class="kasa-item-sign">${e.type==='gelir'?'💚':'🔴'}</span>
-        <div class="kasa-item-info">
-          <div class="kasa-item-desc">${escHtml(e.desc)}</div>
-          <div class="kasa-item-meta">${kasaCatLabels[e.cat]||e.cat} · ${d}</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="kasa-item-sign">${e.type==='gelir'?'💚':'🔴'}</span>
+          <div class="kasa-item-info">
+            <div class="kasa-item-desc">${escHtml(e.desc)}</div>
+            <div class="kasa-item-meta">${kasaCatLabels[e.cat]||e.cat} · ${d}</div>
+          </div>
+          <span class="kasa-item-amount ${e.type}">${e.type==='gelir'?'+':'−'}${formatMoney(e.amount)}</span>
+          <button class="kasa-item-del" onclick="toggleKasaEdit(${e.id})" title="Düzenle" style="color:var(--accent2);">✏️</button>
+          <button class="kasa-item-del" onclick="deleteKasaEntry(${e.id})" title="Sil">×</button>
         </div>
-        <span class="kasa-item-amount ${e.type}">${e.type==='gelir'?'+':'−'}${formatMoney(e.amount)}</span>
-        <button class="kasa-item-del" onclick="addKasaToGCal(${e.id})" title="Takvime ekle" style="opacity:0;color:var(--accent2);font-size:12px;">📅</button>
-        <button class="kasa-item-del" onclick="deleteKasaEntry(${e.id})" title="Sil">×</button>`;
+        <div class="kasa-edit-form" id="kedit-${e.id}">
+          <input class="kasa-edit-input" id="kedit-desc-${e.id}" value="${escHtml(e.desc)}" placeholder="Açıklama" style="flex:1;min-width:100px;">
+          <input class="kasa-edit-input" id="kedit-amount-${e.id}" type="number" value="${e.amount}" style="width:80px;" placeholder="Tutar">
+          <select class="kasa-edit-input" id="kedit-cat-${e.id}">
+            ${Object.entries(kasaCatLabels).map(([k,v])=>`<option value="${k}"${e.cat===k?' selected':''}>${v}</option>`).join('')}
+          </select>
+          <select class="kasa-edit-input" id="kedit-type-${e.id}">
+            <option value="gider"${e.type==='gider'?' selected':''}>🔴 Gider</option>
+            <option value="gelir"${e.type==='gelir'?' selected':''}>💚 Gelir</option>
+          </select>
+          <input class="kasa-edit-input" id="kedit-date-${e.id}" type="date" value="${e.date||''}" style="width:120px;">
+          <button class="kasa-edit-save" onclick="saveKasaEdit(${e.id})">✅ Kaydet</button>
+          <button class="kasa-edit-cancel" onclick="toggleKasaEdit(${e.id})">İptal</button>
+        </div>`;
       list.appendChild(item);
     });
   }
