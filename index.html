@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dijital Beyin">
-<title>Dijital Beyin</title>
+<title>Dijital Beyin v3</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -270,11 +270,75 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 /* ── NOTIF BADGE ── */
 .notif-badge{position:fixed;top:16px;right:16px;background:var(--accent3);color:#fff;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;box-shadow:0 4px 18px rgba(247,129,102,.4);z-index:800;animation:card-in .3s ease;cursor:pointer;display:flex;align-items:center;gap:5px;}
 
-/* ── TOOLTIP ── */
+/* ── KASA ── */
+.kasa-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.kasa-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center;}
+.kasa-card-num{font-size:20px;font-weight:800;font-family:'DM Mono',monospace;line-height:1;margin-bottom:4px;}
+.kasa-card-num.gelir{color:var(--accent);}
+.kasa-card-num.gider{color:var(--accent3);}
+.kasa-card-num.net.pozitif{color:var(--accent);}
+.kasa-card-num.net.negatif{color:var(--accent3);}
+.kasa-card-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;}
+.kasa-add{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.kasa-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.kasa-input{flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;outline:none;}
+.kasa-input:focus{border-color:var(--accent2);}
+.kasa-input::placeholder{color:var(--text-dim);}
+.kasa-amount{width:110px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;font-weight:700;outline:none;text-align:right;}
+.kasa-amount:focus{border-color:var(--accent);}
+.kasa-type-btns{display:flex;gap:4px;}
+.kasa-type-btn{padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;border:1.5px solid transparent;transition:all .15s;}
+.kasa-type-btn.gelir-btn{border-color:var(--accent);color:var(--accent);}
+.kasa-type-btn.gider-btn{border-color:var(--accent3);color:var(--accent3);}
+.kasa-type-btn.gelir-btn.active{background:var(--accent);color:#000;}
+.kasa-type-btn.gider-btn.active{background:var(--accent3);color:#000;}
+.kasa-cat-sel{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text-muted);font-size:11px;font-family:'DM Mono',monospace;outline:none;cursor:pointer;}
+.kasa-cat-sel:focus{border-color:var(--accent2);color:var(--text);}
+.kasa-save-btn{background:linear-gradient(135deg,var(--accent),#2ea043);color:#000;border:none;border-radius:8px;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.kasa-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(57,211,83,.3);}
+.kasa-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;max-height:320px;overflow-y:auto;}
+.kasa-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;animation:card-in .25s ease;}
+.kasa-item:hover{border-color:var(--border2);}
+.kasa-item-sign{font-size:16px;width:24px;text-align:center;flex-shrink:0;}
+.kasa-item-info{flex:1;min-width:0;}
+.kasa-item-desc{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kasa-item-meta{font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;margin-top:1px;}
+.kasa-item-amount{font-size:14px;font-weight:800;font-family:'DM Mono',monospace;flex-shrink:0;}
+.kasa-item-amount.gelir{color:var(--accent);}
+.kasa-item-amount.gider{color:var(--accent3);}
+.kasa-item-del{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:4px;transition:all .1s;opacity:0;}
+.kasa-item:hover .kasa-item-del{opacity:1;}
+.kasa-item-del:hover{background:var(--surface2);color:var(--accent3);}
+/* Category bar chart */
+.kasa-chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;}
+.kasa-chart-title{font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
+.kasa-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.kasa-bar-label{font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;width:80px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kasa-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.kasa-bar-fill{height:100%;border-radius:4px;background:var(--accent3);transition:width .5s ease;}
+.kasa-bar-fill.gelir{background:var(--accent);}
+.kasa-bar-val{font-size:10px;font-family:'DM Mono',monospace;color:var(--text-muted);width:70px;text-align:right;flex-shrink:0;}
+.kasa-filter-row{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.kasa-filter-btn{padding:5px 10px;border-radius:7px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .15s;}
+.kasa-filter-btn.active{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+.kasa-ai-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent4),var(--accent2));color:#000;border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:10px;}
+.kasa-ai-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(210,168,255,.3);}
+.kasa-ai-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+/* AI action buttons on cards */
+.ai-card-actions{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.ai-card-btn{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);transition:all .15s;display:flex;align-items:center;gap:3px;}
+.ai-card-btn:hover{border-color:var(--accent4);color:var(--accent4);}
+.ai-card-btn:disabled{opacity:.4;cursor:not-allowed;}
+.ai-card-result{margin-top:8px;padding:8px 10px;background:rgba(210,168,255,.08);border:1px solid rgba(210,168,255,.2);border-radius:8px;font-size:12px;color:var(--text);line-height:1.6;display:none;}
+.ai-card-result.visible{display:block;}
+/* Weekly report */
+.report-section{margin-top:14px;}
+.report-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:12px;line-height:1.7;color:var(--text);white-space:pre-wrap;display:none;}
+.report-box.visible{display:block;} */
 .tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:50;}
 .heatmap-cell:hover .tooltip{opacity:1;}
 
-/* ── PHOTO STYLES ── */
+/* ── TOOLTIP ── */
 .photo-row{display:flex;gap:8px;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;}
 .photo-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;cursor:pointer;border:1.5px dashed var(--border2);background:transparent;color:var(--text-muted);transition:all .2s;}
 .photo-btn:hover{border-color:var(--accent2);color:var(--accent2);}
@@ -313,7 +377,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   <header>
     <div class="logo">
       <div class="brain-icon">🧠</div>
-      <div class="logo-text"><h1>Dijital Beyin</h1><span>hafıza merkezi v2</span></div>
+      <div class="logo-text"><h1>Dijital Beyin</h1><span>hafıza & kasa v3</span></div>
     </div>
     <div class="header-stats">
       <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">Toplam</div></div>
@@ -325,6 +389,7 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
   <!-- Nav Tabs -->
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="switchTab('notes',this)">📝 Notlar</button>
+    <button class="nav-tab" onclick="switchTab('kasa',this)">💰 Kasa</button>
     <button class="nav-tab" onclick="switchTab('coach',this)">🤖 AI Koç</button>
     <button class="nav-tab" onclick="switchTab('stats',this)">📊 İstatistik</button>
     <button class="nav-tab" onclick="switchTab('settings',this)">⚙️ Ayarlar</button>
@@ -395,26 +460,103 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
     <div id="notes-container"></div>
   </div>
 
+  <!-- ═══ KASA PANEL ═══ -->
+  <div class="panel" id="panel-kasa">
+    <!-- Özet kartları -->
+    <div class="kasa-summary">
+      <div class="kasa-card"><div class="kasa-card-num gelir" id="k-gelir">0₺</div><div class="kasa-card-label">💚 Gelir</div></div>
+      <div class="kasa-card"><div class="kasa-card-num gider" id="k-gider">0₺</div><div class="kasa-card-label">🔴 Gider</div></div>
+      <div class="kasa-card"><div class="kasa-card-num net" id="k-net">0₺</div><div class="kasa-card-label">💎 Net Bakiye</div></div>
+    </div>
+
+    <!-- Giriş formu -->
+    <div class="kasa-add">
+      <div class="kasa-row">
+        <div class="kasa-type-btns">
+          <button class="kasa-type-btn gelir-btn active" onclick="setKasaType('gelir',this)">+ Gelir</button>
+          <button class="kasa-type-btn gider-btn" onclick="setKasaType('gider',this)">- Gider</button>
+        </div>
+        <input type="number" class="kasa-amount" id="kasa-amount" placeholder="0.00" min="0" step="0.01">
+        <select class="kasa-cat-sel" id="kasa-cat">
+          <option value="market">🛒 Market</option>
+          <option value="yemek">🍕 Yemek/Restoran</option>
+          <option value="kira">🏠 Kira</option>
+          <option value="fatura">💡 Fatura</option>
+          <option value="ulasim">🚗 Ulaşım</option>
+          <option value="saglik">💊 Sağlık</option>
+          <option value="eglence">🎮 Eğlence</option>
+          <option value="giyim">👕 Giyim</option>
+          <option value="egitim">📚 Eğitim</option>
+          <option value="freelance">💻 Freelance</option>
+          <option value="maas">💼 Maaş</option>
+          <option value="diger">📦 Diğer</option>
+        </select>
+      </div>
+      <div class="kasa-row">
+        <input type="text" class="kasa-input" id="kasa-desc" placeholder="Açıklama (opsiyonel)…">
+        <input type="date" class="kasa-input" id="kasa-date" style="width:130px;flex:none;">
+        <button class="kasa-save-btn" onclick="addKasaEntry()">+ Ekle</button>
+      </div>
+    </div>
+
+    <!-- Filtre -->
+    <div class="kasa-filter-row">
+      <button class="kasa-filter-btn active" data-kf="all" onclick="setKasaFilter(this)">Tümü</button>
+      <button class="kasa-filter-btn" data-kf="gelir" onclick="setKasaFilter(this)">💚 Gelir</button>
+      <button class="kasa-filter-btn" data-kf="gider" onclick="setKasaFilter(this)">🔴 Gider</button>
+      <button class="kasa-filter-btn" data-kf="market" onclick="setKasaFilter(this)">🛒 Market</button>
+      <button class="kasa-filter-btn" data-kf="fatura" onclick="setKasaFilter(this)">💡 Fatura</button>
+      <button class="kasa-filter-btn" data-kf="yemek" onclick="setKasaFilter(this)">🍕 Yemek</button>
+    </div>
+
+    <!-- İşlem listesi -->
+    <div class="kasa-list" id="kasa-list"></div>
+
+    <!-- Kategori grafik -->
+    <div class="kasa-chart">
+      <div class="kasa-chart-title">
+        Kategori Dağılımı
+        <span id="kasa-period-label" style="font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"></span>
+      </div>
+      <div id="kasa-bars"></div>
+    </div>
+
+    <!-- AI Kasa Raporu -->
+    <button class="kasa-ai-btn" onclick="kasaAIReport()" id="kasa-ai-btn">
+      ✨ AI Kasa Raporu Al
+    </button>
+    <div class="ai-loading" id="kasa-ai-loading">
+      <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
+      <span>Harcamalar analiz ediliyor…</span>
+    </div>
+    <div class="report-box" id="kasa-report"></div>
+  </div>
+
   <!-- ═══ AI COACH PANEL ═══ -->
   <div class="panel" id="panel-coach">
     <div class="ai-coach">
       <div class="ai-header">
         <div class="ai-avatar">🤖</div>
-        <div><div class="ai-title">AI Günlük Koç</div><div class="ai-subtitle">Gemini ile bugünü planla</div></div>
+        <div><div class="ai-title">AI Günlük Koç</div><div class="ai-subtitle">Gemini ile analiz et</div></div>
       </div>
       <div class="ai-api-key-row">
         <input type="password" class="api-key-input" id="api-key-input" placeholder="Gemini API key (AIza…)" autocomplete="off">
         <button class="api-save-btn" onclick="saveApiKey()">💾 Kaydet</button>
       </div>
-      <button class="ai-btn" onclick="askCoach()" id="ai-ask-btn">
-        ✨ Bugün ne yapmalıyım?
-      </button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="ai-btn" onclick="askCoach('daily')" id="ai-ask-btn" style="margin-bottom:0;flex:1;">
+          ✨ Bugün ne yapmalıyım?
+        </button>
+        <button class="ai-btn" onclick="askCoach('weekly')" id="ai-week-btn" style="margin-bottom:0;flex:1;background:linear-gradient(135deg,var(--accent2),#388bfd);">
+          📊 Haftalık Rapor
+        </button>
+      </div>
       <div class="ai-loading" id="ai-loading">
         <div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>
         <span>Notların analiz ediliyor…</span>
       </div>
       <div class="ai-response" id="ai-response"></div>
-      <div class="ai-note">🔑 API key sadece tarayıcına kaydedilir. Ücretsiz key: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com</a></div>
+      <div class="ai-note">🔑 Ücretsiz key: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent2)">aistudio.google.com</a></div>
     </div>
   </div>
 
@@ -512,6 +654,9 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 //  STATE
 // ══════════════════════════════════════════
 let notes = JSON.parse(localStorage.getItem('db-notes') || '[]');
+let kasaEntries = JSON.parse(localStorage.getItem('db-kasa') || '[]');
+let kasaType = 'gider';
+let kasaFilterVal = 'all';
 let apiKey = localStorage.getItem('db-apikey') || '';
 let userPin = localStorage.getItem('db-pin') || '';
 let selectedCat = 'yapilacak';
@@ -532,11 +677,14 @@ document.getElementById('capture-input').addEventListener('keydown', e => {
 });
 if (apiKey) document.getElementById('api-key-input').value = apiKey;
 if (userPin) document.getElementById('pin-status').textContent = '✅ PIN aktif';
+// Set today's date in kasa
+document.getElementById('kasa-date').value = new Date().toISOString().slice(0,10);
 requestNotifPermission();
 renderNotes();
 updateStats();
 initReminders();
 initPWA();
+renderKasa();
 setTimeout(buildHeatmap, 100);
 
 // ══════════════════════════════════════════
@@ -757,6 +905,12 @@ function makeCard(note) {
     </div>
     ${photoHTML}
     <div class="note-text">${escHtml(note.text)}</div>
+    <div class="ai-card-actions">
+      <button class="ai-card-btn" onclick="aiAutoCategory(${note.id},this)" title="AI kategori belirlesin">🏷️ Kategorile</button>
+      <button class="ai-card-btn" onclick="aiExpand(${note.id},this)" title="AI notu genişletsin">📝 Genişlet</button>
+      ${note.source==='voice'?`<button class="ai-card-btn" onclick="aiFixVoice(${note.id},this)" title="AI ses yazısını düzeltsin">🔧 Düzelt</button>`:''}
+    </div>
+    <div class="ai-card-result" id="air-${note.id}"></div>
     <div class="note-footer">
       <span class="note-date">${formatDate(note.created)} ${editedBadge}${secretBadge}${srcBadge}</span>
       ${speakHTML || reminderHTML}
@@ -946,12 +1100,12 @@ function saveApiKey() {
   showToast('🔑 API key kaydedildi', 'success');
 }
 
-async function askCoach() {
+async function askCoach(mode) {
   if (!apiKey) { showToast('⚠️ Önce API key gir!', 'warning'); document.getElementById('api-key-input').focus(); return; }
-  const btn = document.getElementById('ai-ask-btn');
   const loading = document.getElementById('ai-loading');
   const resp = document.getElementById('ai-response');
-  btn.disabled = true;
+  document.getElementById('ai-ask-btn').disabled = true;
+  document.getElementById('ai-week-btn').disabled = true;
   loading.classList.add('visible');
   resp.classList.remove('visible');
   resp.textContent = '';
@@ -960,7 +1114,40 @@ async function askCoach() {
   const notesList = activeNotes.map(n => `- [${catLabel(n.cat)}] ${n.text}`).join('\n');
   const today = new Date().toLocaleDateString('tr-TR', {weekday:'long', day:'numeric', month:'long'});
 
-  const prompt = `Sen bir verimlilik koçusun. Kullanıcının Türkçe not uygulamasındaki aktif notlarını analiz et.
+  let prompt = '';
+  if (mode === 'weekly') {
+    // Last 7 days notes
+    const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate()-7);
+    const weekNotes = notes.filter(n => new Date(n.created) >= weekAgo);
+    const doneCount = weekNotes.filter(n=>n.done).length;
+    const kasaWeek = kasaEntries.filter(e => new Date(e.date) >= weekAgo);
+    const weekGelir = kasaWeek.filter(e=>e.type==='gelir').reduce((s,e)=>s+e.amount,0);
+    const weekGider = kasaWeek.filter(e=>e.type==='gider').reduce((s,e)=>s+e.amount,0);
+    prompt = `Sen kişisel verimlilik koçusun. Kullanıcının geçen haftaki aktivitesini analiz et.
+
+Haftalık Not Özeti:
+- Toplam not: ${weekNotes.length}
+- Tamamlanan: ${doneCount}
+- Bekleyen: ${weekNotes.length - doneCount}
+
+Notlar:
+${weekNotes.map(n=>`- [${catLabel(n.cat)}${n.done?'✓':''}] ${n.text}`).join('\n') || '(not yok)'}
+
+Finansal Özet (bu hafta):
+- Gelir: ${weekGelir}₺
+- Gider: ${weekGider}₺
+- Net: ${weekGelir-weekGider}₺
+
+Şunları yap:
+1. Haftalık verimlilik değerlendirmesi (ne kadar tamamlandı?)
+2. En önemli tamamlanmamış görevleri say
+3. Finansal durum hakkında 1-2 cümle
+4. Gelecek hafta için 3 öneri
+5. Motivasyon cümlesi
+
+Kısa, madde madde, Türkçe.`;
+  } else {
+    prompt = `Sen bir verimlilik koçusun. Kullanıcının not uygulamasındaki aktif notlarını analiz et.
 
 Bugün: ${today}
 
@@ -974,33 +1161,18 @@ Görev:
 4. Güne başlamak için 1 kısa motivasyon cümlesi yaz
 
 Kısa, net, Türkçe yanıt ver. Madde madde yaz.`;
+  }
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 600, temperature: 0.7 }
-        })
-      }
-    );
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || 'HTTP ' + res.status);
-    }
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Yanıt boş geldi');
+    const text = await callGemini(prompt, 600);
     resp.textContent = text;
     resp.classList.add('visible');
-  } catch (e) {
+  } catch(e) {
     resp.textContent = '❌ Hata: ' + e.message;
     resp.classList.add('visible');
   } finally {
-    btn.disabled = false;
+    document.getElementById('ai-ask-btn').disabled = false;
+    document.getElementById('ai-week-btn').disabled = false;
     loading.classList.remove('visible');
   }
 }
@@ -1254,6 +1426,271 @@ function downloadPhoto() {
   a.click();
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ══════════════════════════════════════════
+//  KASA
+// ══════════════════════════════════════════
+const kasaCatLabels = {
+  market:'🛒 Market', yemek:'🍕 Yemek', kira:'🏠 Kira', fatura:'💡 Fatura',
+  ulasim:'🚗 Ulaşım', saglik:'💊 Sağlık', eglence:'🎮 Eğlence', giyim:'👕 Giyim',
+  egitim:'📚 Eğitim', freelance:'💻 Freelance', maas:'💼 Maaş', diger:'📦 Diğer'
+};
+
+function setKasaType(type, el) {
+  kasaType = type;
+  document.querySelectorAll('.kasa-type-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  // Auto-switch category for income
+  const catSel = document.getElementById('kasa-cat');
+  if (type === 'gelir') {
+    catSel.value = 'maas';
+    // show income cats
+    [...catSel.options].forEach(o => o.style.display = '');
+  } else {
+    catSel.value = 'market';
+  }
+}
+
+function setKasaFilter(el) {
+  document.querySelectorAll('.kasa-filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  kasaFilterVal = el.dataset.kf;
+  renderKasa();
+}
+
+function addKasaEntry() {
+  const amount = parseFloat(document.getElementById('kasa-amount').value);
+  if (!amount || amount <= 0) { showToast('⚠️ Tutar gir!', 'warning'); return; }
+  const entry = {
+    id: Date.now(),
+    type: kasaType,
+    amount,
+    cat: document.getElementById('kasa-cat').value,
+    desc: document.getElementById('kasa-desc').value.trim() || kasaCatLabels[document.getElementById('kasa-cat').value] || '-',
+    date: document.getElementById('kasa-date').value || new Date().toISOString().slice(0,10)
+  };
+  kasaEntries.unshift(entry);
+  saveKasa();
+  renderKasa();
+  document.getElementById('kasa-amount').value = '';
+  document.getElementById('kasa-desc').value = '';
+  document.getElementById('kasa-date').value = new Date().toISOString().slice(0,10);
+  showToast(kasaType === 'gelir' ? '💚 Gelir eklendi!' : '🔴 Gider eklendi!', 'success');
+}
+
+function deleteKasaEntry(id) {
+  kasaEntries = kasaEntries.filter(e => e.id !== id);
+  saveKasa(); renderKasa();
+}
+
+function saveKasa() { localStorage.setItem('db-kasa', JSON.stringify(kasaEntries)); }
+
+function renderKasa() {
+  // Summary
+  const totalGelir = kasaEntries.filter(e => e.type === 'gelir').reduce((s,e) => s+e.amount, 0);
+  const totalGider = kasaEntries.filter(e => e.type === 'gider').reduce((s,e) => s+e.amount, 0);
+  const net = totalGelir - totalGider;
+  document.getElementById('k-gelir').textContent = formatMoney(totalGelir);
+  document.getElementById('k-gider').textContent = formatMoney(totalGider);
+  const netEl = document.getElementById('k-net');
+  netEl.textContent = formatMoney(net);
+  netEl.className = 'kasa-card-num net ' + (net >= 0 ? 'pozitif' : 'negatif');
+
+  // List
+  let filtered = kasaEntries;
+  if (kasaFilterVal !== 'all') {
+    if (kasaFilterVal === 'gelir' || kasaFilterVal === 'gider') filtered = kasaEntries.filter(e => e.type === kasaFilterVal);
+    else filtered = kasaEntries.filter(e => e.cat === kasaFilterVal);
+  }
+  const list = document.getElementById('kasa-list');
+  list.innerHTML = '';
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-dim);font-size:12px;font-family:'DM Mono',monospace;">Henüz işlem yok</div>`;
+  } else {
+    filtered.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'kasa-item';
+      const d = new Date(e.date).toLocaleDateString('tr-TR', {day:'numeric',month:'short'});
+      item.innerHTML = `
+        <span class="kasa-item-sign">${e.type==='gelir'?'💚':'🔴'}</span>
+        <div class="kasa-item-info">
+          <div class="kasa-item-desc">${escHtml(e.desc)}</div>
+          <div class="kasa-item-meta">${kasaCatLabels[e.cat]||e.cat} · ${d}</div>
+        </div>
+        <span class="kasa-item-amount ${e.type}">${e.type==='gelir'?'+':'−'}${formatMoney(e.amount)}</span>
+        <button class="kasa-item-del" onclick="deleteKasaEntry(${e.id})" title="Sil">×</button>`;
+      list.appendChild(item);
+    });
+  }
+
+  // Bar chart — gider categories
+  const bars = document.getElementById('kasa-bars');
+  bars.innerHTML = '';
+  const giderEntries = kasaEntries.filter(e => e.type === 'gider');
+  const catTotals = {};
+  giderEntries.forEach(e => catTotals[e.cat] = (catTotals[e.cat]||0) + e.amount);
+  const sorted = Object.entries(catTotals).sort((a,b) => b[1]-a[1]).slice(0,7);
+  const maxVal = sorted[0]?.[1] || 1;
+  sorted.forEach(([cat, val]) => {
+    const pct = Math.round(val / maxVal * 100);
+    const row = document.createElement('div');
+    row.className = 'kasa-bar-row';
+    row.innerHTML = `
+      <span class="kasa-bar-label">${kasaCatLabels[cat]||cat}</span>
+      <div class="kasa-bar-track"><div class="kasa-bar-fill" style="width:${pct}%"></div></div>
+      <span class="kasa-bar-val">${formatMoney(val)}</span>`;
+    bars.appendChild(row);
+  });
+  if (sorted.length === 0) bars.innerHTML = `<div style="font-size:11px;color:var(--text-dim);font-family:'DM Mono',monospace;">Gider girisi yok</div>`;
+
+  document.getElementById('kasa-period-label').textContent = `${kasaEntries.length} işlem`;
+}
+
+function formatMoney(n) {
+  if (n >= 1000) return (n/1000).toFixed(1).replace('.',',') + 'B₺';
+  return n.toLocaleString('tr-TR', {minimumFractionDigits:0, maximumFractionDigits:0}) + '₺';
+}
+
+async function kasaAIReport() {
+  if (!apiKey) { showToast('⚠️ AI Koç tabından API key gir!', 'warning'); return; }
+  const btn = document.getElementById('kasa-ai-btn');
+  const loading = document.getElementById('kasa-ai-loading');
+  const report = document.getElementById('kasa-report');
+  btn.disabled = true;
+  loading.classList.add('visible');
+  report.classList.remove('visible');
+
+  const totalGelir = kasaEntries.filter(e => e.type==='gelir').reduce((s,e)=>s+e.amount,0);
+  const totalGider = kasaEntries.filter(e => e.type==='gider').reduce((s,e)=>s+e.amount,0);
+  const catTotals = {};
+  kasaEntries.filter(e=>e.type==='gider').forEach(e => catTotals[e.cat]=(catTotals[e.cat]||0)+e.amount);
+  const catList = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`${kasaCatLabels[c]}: ${v}₺`).join('\n');
+  const recentList = kasaEntries.slice(0,20).map(e=>`${e.type==='gelir'?'+':'-'}${e.amount}₺ ${kasaCatLabels[e.cat]||e.cat} - ${e.desc}`).join('\n');
+
+  const prompt = `Sen kişisel finans koçusun. Kullanıcının harcama verilerini analiz et.
+
+Toplam Gelir: ${totalGelir}₺
+Toplam Gider: ${totalGider}₺
+Net Bakiye: ${totalGelir-totalGider}₺
+
+Kategori dağılımı (gider):
+${catList || 'veri yok'}
+
+Son işlemler:
+${recentList || 'veri yok'}
+
+Şunları yap:
+1. Genel finansal durumu değerlendir (2-3 cümle)
+2. En yüksek 3 gider kategorisini yorumla
+3. Tasarruf önerileri sun (somut, uygulanabilir)
+4. Gelir/gider dengesini iyileştirmek için 1 aksiyon öner
+
+Kısa, net, Türkçe. Madde madde yaz.`;
+
+  try {
+    const text = await callGemini(prompt, 500);
+    report.textContent = text;
+    report.classList.add('visible');
+  } catch(e) {
+    report.textContent = '❌ Hata: ' + e.message;
+    report.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    loading.classList.remove('visible');
+  }
+}
+
+// ══════════════════════════════════════════
+//  AI CARD FEATURES
+// ══════════════════════════════════════════
+async function aiAutoCategory(id, btn) {
+  if (!apiKey) { showToast('⚠️ API key gir!', 'warning'); return; }
+  const n = notes.find(n => n.id === id);
+  if (!n) return;
+  btn.disabled = true; btn.textContent = '⏳…';
+  const prompt = `Şu notu analiz et ve sadece şu 4 kategoriden birini döndür (başka hiçbir şey yazma): yapilacak, hatirla, fikir, onemli
+
+Not: "${n.text}"
+
+Cevap (sadece kategori adı):`;
+  try {
+    const result = (await callGemini(prompt, 20)).trim().toLowerCase();
+    const valid = ['yapilacak','hatirla','fikir','onemli'];
+    const cat = valid.find(c => result.includes(c)) || 'hatirla';
+    n.cat = cat;
+    save(); renderNotes();
+    showToast(`🏷️ Kategori: ${catLabel(cat)}`, 'success');
+  } catch(e) {
+    showToast('❌ Hata: ' + e.message, 'warning');
+    btn.disabled = false; btn.textContent = '🏷️ Kategorile';
+  }
+}
+
+async function aiExpand(id, btn) {
+  if (!apiKey) { showToast('⚠️ API key gir!', 'warning'); return; }
+  const n = notes.find(n => n.id === id);
+  if (!n) return;
+  btn.disabled = true; btn.textContent = '⏳…';
+  const resultEl = document.getElementById('air-' + id);
+  const prompt = `Şu kısa notu genişlet ve somut adımlara böl. Türkçe, kısa madde madde listesi yap (max 5 madde):
+
+Not: "${n.text}"`;
+  try {
+    const text = await callGemini(prompt, 300);
+    resultEl.textContent = text;
+    resultEl.classList.add('visible');
+    showToast('📝 Not genişletildi!', 'success');
+  } catch(e) {
+    showToast('❌ Hata: ' + e.message, 'warning');
+  } finally {
+    btn.disabled = false; btn.textContent = '📝 Genişlet';
+  }
+}
+
+async function aiFixVoice(id, btn) {
+  if (!apiKey) { showToast('⚠️ API key gir!', 'warning'); return; }
+  const n = notes.find(n => n.id === id);
+  if (!n) return;
+  btn.disabled = true; btn.textContent = '⏳…';
+  const prompt = `Aşağıdaki metin ses tanıma ile alındı, hataları düzelt, noktalama ve yazım yanlışlarını düzelt. Sadece düzeltilmiş metni döndür, açıklama yapma:
+
+"${n.text}"`;
+  try {
+    const fixed = (await callGemini(prompt, 200)).trim().replace(/^["']|["']$/g,'');
+    n.text = fixed;
+    n.edited = new Date().toISOString();
+    save(); renderNotes();
+    showToast('🔧 Ses yazısı düzeltildi!', 'success');
+  } catch(e) {
+    showToast('❌ Hata: ' + e.message, 'warning');
+    btn.disabled = false; btn.textContent = '🔧 Düzelt';
+  }
+}
+
+// ══════════════════════════════════════════
+//  GEMINI HELPER
+// ══════════════════════════════════════════
+async function callGemini(prompt, maxTokens = 600) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7 }
+      })
+    }
+  );
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || 'HTTP ' + res.status);
+  }
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error('Yanıt boş');
+  return text;
+}
 
 // ══════════════════════════════════════════
 //  HELPERS
